@@ -127,3 +127,22 @@ Data/
   AppDbContext.cs
   <entity>.cs
 ```
+
+### Struktur
+
+Projektet är upplagt så att både Entity Framework (EF) och Dapper kan användas sida vid sida utan att koden blandas ihop.
+Varje del har sin egen tydliga roll:
+
+/Controllers
+Hanterar HTTP-anropen. Härifrån anropas respektive repository (EF eller Dapper) och resultatet returneras som API-svar.
+
+/Repositories
+Här ligger all kod som pratar direkt med databasen.
+IPostRepository definierar gränssnittet som båda implementationerna följer.
+EfPostRepository använder Entity Framework och AppDbContext, medan
+DapperPostRepository använder Dapper och SQL.
+
+/Data
+Innehåller allt som genereras av dotnet ef dbcontext scaffold, alltså själva datamodellerna och AppDbContext som representerar databasen i EF.
+
+Det här upplägget gör att logiken hålls ren och tydlig. Controllern bryr sig inte om vilken teknik som används bakom kulisserna, och man kan enkelt lägga till fler jämförelser eller queries senare.

@@ -1,13 +1,35 @@
-var builder = WebApplication.CreateBuilder(args);
+using System.Data;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Stackoverflow.Data;
+using Stackoverflow.Repositories.Posts;
+using Stackoverflow.Services.Posts;
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+var builder = WebApplication.CreateBuilder(args);
+var cs = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// EF DbContext och Dapper connection
+builder.Services.AddDbContext<AppDbContext>(o => o.UseSqlServer(cs));
+builder.Services.AddScoped<SqlConnection>(_ => new SqlConnection(cs));
+// Repos
+builder.Services.AddScoped<EfPostRepository>();
+builder.Services.AddScoped<DapperPostRepository>();
+
+// Services
+builder.Services.AddScoped<EfPostService>(sp =>
+    new EfPostService(sp.GetRequiredService<EfPostRepository>()));
+builder.Services.AddScoped<DapperPostService>(sp =>
+    new DapperPostService(sp.GetRequiredService<DapperPostRepository>()));
+
+builder.Services.AddControllers();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -16,6 +38,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.MapControllers();
 
 app.Run();
 

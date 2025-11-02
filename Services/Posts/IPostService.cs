@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Stackoverflow.Data;
 
-namespace Stackoverflow.Repositories.Posts
+namespace Stackoverflow.Services.Posts
 {
-    public interface IPostRepository
+    public interface IPostService
     {
         Task<Post?> GetByIdAsync(int id, CancellationToken ct = default);
         Task<IEnumerable<Post>> Get100LatestAsync(CancellationToken ct = default);
@@ -14,7 +14,5 @@ namespace Stackoverflow.Repositories.Posts
         Task<IEnumerable<Post>> GetBetweenDates(DateTime fromDate, DateTime toDate, CancellationToken ct = default);
         Task<int> GetPostCount(CancellationToken ct = default);
         Task<IEnumerable<string>> GetAllTags(CancellationToken ct = default);
-
-
     }
 }
