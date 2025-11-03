@@ -9,7 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 var cs = builder.Configuration.GetConnectionString("DefaultConnection");
 
 // EF DbContext och Dapper connection
-builder.Services.AddDbContext<AppDbContext>(o => o.UseSqlServer(cs));
+// behöver öka timeouten för komplexa queries timar ut utan index
+builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(cs, sqlOptions => sqlOptions.CommandTimeout(600)));
 builder.Services.AddScoped<SqlConnection>(_ => new SqlConnection(cs));
 // Repos
 builder.Services.AddScoped<EfPostRepository>();

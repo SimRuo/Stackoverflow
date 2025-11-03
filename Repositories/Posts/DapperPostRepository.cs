@@ -60,5 +60,38 @@ namespace Stackoverflow.Repositories.Posts
                 .OrderBy(t => t)
                 .ToList();
         }
+
+        public async Task<IEnumerable<Post>> GetTopQuestionsByScoreAsync(int minScore, int take = 100, CancellationToken ct = default)
+        {
+            await EnsureOpenAsync(ct);
+            const string sql = @"
+            SELECT TOP (@Take) *
+            FROM Posts
+            WHERE PostTypeId = 1 AND Score > @MinScore
+            ORDER BY Score DESC, CreationDate DESC;";
+            return await connection.QueryAsync<Post>(sql, new { MinScore = minScore, Take = take });
+        }
+
+        public async Task<IEnumerable<Comment>> GetCommentsForPostAsync(int postId, CancellationToken ct = default)
+        {
+            await EnsureOpenAsync(ct);
+            const string sql = @"
+            SELECT *
+            FROM Comments
+            WHERE PostId = @PostId
+            ORDER BY CreationDate ASC;";
+            return await connection.QueryAsync<Comment>(sql, new { PostId = postId });
+        }
+
+        public async Task<IEnumerable<Post>> GetAnswersForQuestionAsync(int questionId, CancellationToken ct = default)
+        {
+            await EnsureOpenAsync(ct);
+            const string sql = @"
+            SELECT *
+            FROM Posts
+            WHERE PostTypeId = 2 AND ParentId = @QuestionId
+            ORDER BY Score DESC, CreationDate ASC;";
+            return await connection.QueryAsync<Post>(sql, new { QuestionId = questionId });
+        }
     }
 }

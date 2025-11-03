@@ -14,5 +14,8 @@ namespace Stackoverflow.Services.Posts
         Task<IEnumerable<Post>> GetBetweenDates(DateTime fromDate, DateTime toDate, CancellationToken ct = default);
         Task<int> GetPostCount(CancellationToken ct = default);
         Task<IEnumerable<string>> GetAllTags(CancellationToken ct = default);
+        Task<IEnumerable<Post>> GetTopQuestionsByScoreAsync(int minScore, int take = 100, CancellationToken ct = default);
+        Task<IEnumerable<Comment>> GetCommentsForPostAsync(int postId, CancellationToken ct = default);
+        Task<IEnumerable<Post>> GetAnswersForQuestionAsync(int questionId, CancellationToken ct = default);
     }
 }

@@ -22,5 +22,13 @@ namespace Stackoverflow.Services.Posts
 
         public Task<IEnumerable<string>> GetAllTags(CancellationToken ct = default) =>
             repo.GetAllTags(ct);
+        public Task<IEnumerable<Post>> GetTopQuestionsByScoreAsync(int minScore, int take = 100, CancellationToken ct = default) =>
+repo.GetTopQuestionsByScoreAsync(minScore, take, ct);
+
+        public Task<IEnumerable<Comment>> GetCommentsForPostAsync(int postId, CancellationToken ct = default) =>
+            repo.GetCommentsForPostAsync(postId, ct);
+
+        public Task<IEnumerable<Post>> GetAnswersForQuestionAsync(int questionId, CancellationToken ct = default) =>
+            repo.GetAnswersForQuestionAsync(questionId, ct);
     }
 }

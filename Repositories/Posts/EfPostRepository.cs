@@ -44,5 +44,25 @@ namespace Stackoverflow.Repositories.Posts
                 .OrderBy(t => t)
                 .ToList();
         }
+        public async Task<IEnumerable<Post>> GetTopQuestionsByScoreAsync(int minScore, int take = 100, CancellationToken ct = default) =>
+    await db.Posts.AsNoTracking()
+        .Where(p => p.PostTypeId == 1 && p.Score > minScore)
+        .OrderByDescending(p => p.Score)
+        .ThenByDescending(p => p.CreationDate)
+        .Take(take)
+        .ToListAsync(ct);
+
+        public async Task<IEnumerable<Comment>> GetCommentsForPostAsync(int postId, CancellationToken ct = default) =>
+            await db.Comments.AsNoTracking()
+                .Where(c => c.PostId == postId)
+                .OrderBy(c => c.CreationDate)
+                .ToListAsync(ct);
+
+        public async Task<IEnumerable<Post>> GetAnswersForQuestionAsync(int questionId, CancellationToken ct = default) =>
+            await db.Posts.AsNoTracking()
+                .Where(p => p.PostTypeId == 2 && p.ParentId == questionId)
+                .OrderByDescending(p => p.Score)
+                .ThenBy(p => p.CreationDate)
+                .ToListAsync(ct);
     }
 }

@@ -40,7 +40,7 @@ namespace Stackoverflow.Controllers
             return Ok(posts);
         }
 
-        // --- POSTS ABOVE REPUTATION (uses Score column) ---
+        // --- POSTS ABOVE REPUTATION ---
         [HttpGet("score/{minScore:int}/ef")]
         public async Task<ActionResult<IEnumerable<Post>>> GetAboveReputationEf(int minScore, CancellationToken ct)
         {
@@ -55,7 +55,7 @@ namespace Stackoverflow.Controllers
             return Ok(posts);
         }
 
-        // --- POSTS BETWEEN DATES ---
+        // --- POSTS BETWEEN DATES --- format 8/18/2011. Extremt seg på EF
         [HttpGet("between/ef")]
         public async Task<ActionResult<IEnumerable<Post>>> GetBetweenDatesEf(
             [FromQuery] DateTime from,
@@ -105,5 +105,32 @@ namespace Stackoverflow.Controllers
             var tags = await dapperService.GetAllTags(ct);
             return Ok(tags);
         }
+        // TOP QUESTIONS BY SCORE
+        [HttpGet("top-questions/ef")]
+        public async Task<ActionResult<IEnumerable<Post>>> TopQuestionsEf([FromQuery] int minScore = 10, [FromQuery] int take = 100, CancellationToken ct = default)
+            => Ok(await efService.GetTopQuestionsByScoreAsync(minScore, Math.Clamp(take, 1, 1000), ct));
+
+        [HttpGet("top-questions/dapper")]
+        public async Task<ActionResult<IEnumerable<Post>>> TopQuestionsDapper([FromQuery] int minScore = 10, [FromQuery] int take = 100, CancellationToken ct = default)
+            => Ok(await dapperService.GetTopQuestionsByScoreAsync(minScore, Math.Clamp(take, 1, 1000), ct));
+
+        // COMMENTS FOR A POST
+        [HttpGet("{postId:int}/comments/ef")]
+        public async Task<ActionResult<IEnumerable<Comment>>> CommentsForPostEf(int postId, CancellationToken ct)
+            => Ok(await efService.GetCommentsForPostAsync(postId, ct));
+
+        [HttpGet("{postId:int}/comments/dapper")]
+        public async Task<ActionResult<IEnumerable<Comment>>> CommentsForPostDapper(int postId, CancellationToken ct)
+            => Ok(await dapperService.GetCommentsForPostAsync(postId, ct));
+
+        // ANSWERS FOR A QUESTION
+        [HttpGet("{questionId:int}/answers/ef")]
+        public async Task<ActionResult<IEnumerable<Post>>> AnswersForQuestionEf(int questionId, CancellationToken ct)
+            => Ok(await efService.GetAnswersForQuestionAsync(questionId, ct));
+
+        [HttpGet("{questionId:int}/answers/dapper")]
+        public async Task<ActionResult<IEnumerable<Post>>> AnswersForQuestionDapper(int questionId, CancellationToken ct)
+            => Ok(await dapperService.GetAnswersForQuestionAsync(questionId, ct));
+
     }
 }
